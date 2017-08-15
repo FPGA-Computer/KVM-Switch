@@ -1,0 +1,7 @@
+Qty,Value,Part Num,Package,Parts
+2,0.1uF,0.1uF X7R 0603,CAPC1608X92N,"C3, C4"
+1,1uF,1uF X5R/X7R 0603,CAPC1608X92N,C2
+2,100K,100K 0603,RESC1608X55N,"R1, R2"
+1,STM8S003F3,STM8S003F3,TSSOP20,U1
+1,SWIM Debug,1x3 header for debugger,1X03,J1
+1,PCB,Ordering: https://oshpark.com/shared_projects/IDmovVvi,,
