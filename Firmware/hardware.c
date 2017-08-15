@@ -131,7 +131,7 @@ void Init_Hardware(void)
 void PS2_Task(void)
 {
 	uint16_t ScanCode, Parity;
-	uint8_t Mux;
+	uint8_t HDMI, USB;
 	
 	if(PS2.Avail)
 	{
@@ -202,12 +202,16 @@ void PS2_Task(void)
 		}
 	}
 	
+	HDMI = (HDMI_PORT->IDR & HDMI_SEL_MASK)>>HDMI_SHIFT;
 	// HDMI Mux setting mapped to USB
-	Mux = Mux_Tbl[(HDMI_PORT->IDR & (HDMI_S2|HDMI_S1))>>HDMI_SHIFT];
-
-	// Make the I/O atomic
-	sim();
-	HDMI_PORT->ODR = (HDMI_PORT->ODR & HDMI_SW)|Mux;
-	rim();
+	USB = Mux_Tbl[HDMI];
 	
+	// filters out inactive HDMI, update when USB is not adready the same port
+	if(((HDMI!= HDMI_NO_CONNECT)&&(HDMI_PORT->ODR & USB_SEL_MASK)!= USB))
+	{
+		// Make the Read-Modify-Write I/O atomic
+		sim();
+		HDMI_PORT->ODR = (HDMI_PORT->ODR & HDMI_SW)|USB;
+		rim();
+	}
 }

@@ -46,10 +46,18 @@ enum _PD { PD1=0x02, PD2=0x04, PD3=0x08, PD4=0x10, PD5=0x20, PD6=0x40 };
 
 #define HDMI_S1									PC3
 #define HDMI_S2									PC4
+
 #define HDMI_SW									PC5
+
 #define USB_IN1									PC6
 #define USB_IN2									PC7
 #define HDMI_PORT								GPIOC
+
+#define HDMI_NO_CONNECT					0x01
+#define USB_NO_CONNECT					0x00
+
+#define HDMI_SEL_MASK						(HDMI_S1 | HDMI_S2)
+#define USB_SEL_MASK						(USB_IN1 | USB_IN2)
 
 #define HDMI_SHIFT							3
 #define USB_SHIFT								6
