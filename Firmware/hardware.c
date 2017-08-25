@@ -187,15 +187,21 @@ void PS2_Task(void)
 				case HK_KeyMake_2:		// wait for hot key press again
 				  if((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release) && Milli_Timer1)
 					{	
+						// Wait for USB to finish sending hot key release to host
+						Milli_Timer1 = HOTKEY_USB_WAIT;
+						
+					  while(Milli_Timer1)
+						  /* busy wait */;
+					
 						HDMI_PORT->ODR &= ~HDMI_SW;						// Press select button(active low)	
 					  Milli_Timer2 = HDMI_SW_DELAY;					// hold for delay
 					}
 					else
 						Hotkeys.State = HK_Idle;
 					
-					break;	
+					break;
 			}
-			
+
 			// default to idle
 			Hotkeys.State = HK_Idle;
 			Hotkeys.KeyAttr = 0;

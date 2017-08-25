@@ -109,6 +109,7 @@ typedef struct
 
 #define HOTKEY_RELEASE_DELAY		ms_TO_TICKS(250)
 #define HOTKEY_WAIT_DELAY				ms_TO_TICKS(200)
+#define HOTKEY_USB_WAIT					ms_TO_TICKS(30)
 #define HDMI_SW_DELAY						ms_TO_TICKS(100)
 
 typedef struct
