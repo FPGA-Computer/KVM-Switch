@@ -1,7 +1,7 @@
 KVM Switch
 built from $5 HDMI switch + custom hardware
 
-Details: https://hackaday.io/project/20326-low-cost-kvm-switch
+Details: https://hw-by-design.blogspot.com/2018/07/low-cost-kvm-switch.html
 
 Hardware/ - Eagle CAD schematic, PCB, Sketchup 3D model (zipped)
 Firmware/ - STM8S003 firmware source code for hotkey
