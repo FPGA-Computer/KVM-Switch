@@ -1,0 +1,10 @@
+hardware.c
+main.c
+stm8_interrupt_vector.c
+fifo.h
+hardware.h
+irq.h
+stm8s.h
+..\..\..\..\program files (x86)\cosmic\fse_compilers\cxstm8\hstm8\mods0.h
+..\..\..\..\program files (x86)\cosmic\fse_compilers\cxstm8\hstm8\stdio.h
+stm8s_conf.h
