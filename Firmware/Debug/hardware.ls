@@ -24,8 +24,8 @@
   74                     ; 51 	GPIOA->CR1 = GPIOA->DDR = PA1|PA2|PA3;
   76  0014 350e5002      	mov	20482,#14
   77  0018 5550025003    	mov	20483,20482
-  78                     ; 52 	GPIOD->CR1 = GPIOD->DDR = PD1|PD2|PD3|PD4;
-  80  001d 351e5011      	mov	20497,#30
+  78                     ; 52 	GPIOD->CR1 = GPIOD->DDR = PD2|PD3|PD4;
+  80  001d 351c5011      	mov	20497,#28
   81  0021 5550115012    	mov	20498,20497
   82                     ; 55 	TIM4->CR1 = TIM4_CR1_ARPE|TIM4_CR1_URS|TIM4_CR1_CEN;
   84  0026 35855340      	mov	21312,#133
@@ -169,7 +169,7 @@
  393                     ; 136 	if(PS2.Avail)
  395  00d7 3d0a          	tnz	_PS2+4
  396  00d9 2603          	jrne	L22
- 397  00db cc01a4        	jp	L141
+ 397  00db cc01a8        	jp	L141
  398  00de               L22:
  399                     ; 139 		sim();
  402  00de 9b            sim
@@ -201,7 +201,7 @@
  441  00fe 2608          	jrne	L341
  442                     ; 148 			Hotkeys.KeyAttr |= Key_Release;
  444  0100 72100005      	bset	_Hotkeys+1,#0
- 446  0104 aca401a4      	jpf	L141
+ 446  0104 aca801a8      	jpf	L141
  447  0108               L341:
  448                     ; 149 		else if (ScanCode == PS2_KBD_CODE_EXTENDED)
  450  0108 1e05          	ldw	x,(OFST-1,sp)
@@ -209,7 +209,7 @@
  452  010d 2608          	jrne	L741
  453                     ; 150 			Hotkeys.KeyAttr |= Key_Extend;
  455  010f 72120005      	bset	_Hotkeys+1,#1
- 457  0113 aca401a4      	jpf	L141
+ 457  0113 aca801a8      	jpf	L141
  458  0117               L741:
  459                     ; 153 			switch(Hotkeys.State)
  461  0117 b604          	ld	a,_Hotkeys
@@ -217,157 +217,159 @@
  464  0119 4d            	tnz	a
  465  011a 270b          	jreq	L77
  466  011c 4a            	dec	a
- 467  011d 271d          	jreq	L101
+ 467  011d 271f          	jreq	L101
  468  011f 4a            	dec	a
- 469  0120 273c          	jreq	L301
+ 469  0120 273e          	jreq	L301
  470  0122 4a            	dec	a
- 471  0123 2756          	jreq	L501
- 472  0125 2079          	jra	L551
+ 471  0123 275a          	jreq	L501
+ 472  0125 207d          	jra	L551
  473  0127               L77:
  474                     ; 155 				case HK_Idle:					// wait for hot key press
- 474                     ; 156 				  if((ScanCode == HOTKEY_SCANCODE) && !Hotkeys.KeyAttr)
+ 474                     ; 156 				  if(HOTKEY_MAKE)
  476  0127 1e05          	ldw	x,(OFST-1,sp)
  477  0129 a30014        	cpw	x,#20
- 478  012c 2672          	jrne	L551
- 480  012e 3d05          	tnz	_Hotkeys+1
- 481  0130 266e          	jrne	L551
- 482                     ; 158 						Hotkeys.State = HK_KeyMake_1;
- 484  0132 35010004      	mov	_Hotkeys,#1
- 485                     ; 159 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;
- 487  0136 35190002      	mov	_Milli_Timer1,#25
- 488                     ; 160 						return;
- 490  013a 201b          	jra	L02
- 491  013c               L101:
- 492                     ; 164 				case HK_KeyMake_1:		// wait for hot key release instead of hold
- 492                     ; 165 				  if((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release) && Milli_Timer1)
- 494  013c 1e05          	ldw	x,(OFST-1,sp)
- 495  013e a30014        	cpw	x,#20
- 496  0141 2617          	jrne	L161
- 498  0143 b605          	ld	a,_Hotkeys+1
- 499  0145 a101          	cp	a,#1
- 500  0147 2611          	jrne	L161
- 502  0149 3d02          	tnz	_Milli_Timer1
- 503  014b 270d          	jreq	L161
- 504                     ; 167 						Hotkeys.KeyAttr = 0;
- 506  014d 3f05          	clr	_Hotkeys+1
- 507                     ; 168 						Hotkeys.State = HK_KeyBreak_1;
- 509  014f 35020004      	mov	_Hotkeys,#2
- 510                     ; 169 						Milli_Timer1 = HOTKEY_WAIT_DELAY;				
- 512  0153 35140002      	mov	_Milli_Timer1,#20
- 513                     ; 170 						return;
- 514  0157               L02:
- 517  0157 5b06          	addw	sp,#6
- 518  0159 81            	ret
- 519  015a               L161:
- 520                     ; 173 						Hotkeys.State = HK_Idle;
- 522  015a 3f04          	clr	_Hotkeys
- 523  015c 2042          	jra	L551
- 524  015e               L301:
- 525                     ; 176 				case HK_KeyBreak_1:		// wait for hot key release
- 525                     ; 177 				  if((ScanCode == HOTKEY_SCANCODE) && !Hotkeys.KeyAttr && Milli_Timer1)
- 527  015e 1e05          	ldw	x,(OFST-1,sp)
- 528  0160 a30014        	cpw	x,#20
- 529  0163 2612          	jrne	L561
- 531  0165 3d05          	tnz	_Hotkeys+1
- 532  0167 260e          	jrne	L561
- 534  0169 3d02          	tnz	_Milli_Timer1
- 535  016b 270a          	jreq	L561
- 536                     ; 179 						Hotkeys.State = HK_KeyMake_2;
- 538  016d 35030004      	mov	_Hotkeys,#3
- 539                     ; 180 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;				
- 541  0171 35190002      	mov	_Milli_Timer1,#25
- 542                     ; 181 						return;
- 544  0175 20e0          	jra	L02
- 545  0177               L561:
- 546                     ; 184 						Hotkeys.State = HK_Idle;
- 548  0177 3f04          	clr	_Hotkeys
- 549  0179 2025          	jra	L551
- 550  017b               L501:
- 551                     ; 187 				case HK_KeyMake_2:		// wait for hot key press again
- 551                     ; 188 				  if((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release) && Milli_Timer1)
- 553  017b 1e05          	ldw	x,(OFST-1,sp)
- 554  017d a30014        	cpw	x,#20
- 555  0180 261c          	jrne	L171
- 557  0182 b605          	ld	a,_Hotkeys+1
- 558  0184 a101          	cp	a,#1
- 559  0186 2616          	jrne	L171
- 561  0188 3d02          	tnz	_Milli_Timer1
- 562  018a 2712          	jreq	L171
- 563                     ; 191 						Milli_Timer1 = HOTKEY_USB_WAIT;
- 565  018c 35030002      	mov	_Milli_Timer1,#3
- 566  0190               L371:
- 567                     ; 193 					  while(Milli_Timer1)
- 570  0190 3d02          	tnz	_Milli_Timer1
- 571  0192 26fc          	jrne	L371
- 572                     ; 196 						HDMI_PORT->ODR &= ~HDMI_SW;						// Press select button(active low)	
- 574  0194 721b500a      	bres	20490,#5
- 575                     ; 197 					  Milli_Timer2 = HDMI_SW_DELAY;					// hold for delay
- 577  0198 350a0001      	mov	_Milli_Timer2,#10
- 579  019c 2002          	jra	L551
- 580  019e               L171:
- 581                     ; 200 						Hotkeys.State = HK_Idle;
- 583  019e 3f04          	clr	_Hotkeys
- 584  01a0               L551:
- 585                     ; 206 			Hotkeys.State = HK_Idle;
- 587  01a0 3f04          	clr	_Hotkeys
- 588                     ; 207 			Hotkeys.KeyAttr = 0;
- 590  01a2 3f05          	clr	_Hotkeys+1
- 591  01a4               L141:
- 592                     ; 211 	HDMI = (HDMI_PORT->IDR & HDMI_SEL_MASK)>>HDMI_SHIFT;
- 594  01a4 c6500b        	ld	a,20491
- 595  01a7 44            	srl	a
- 596  01a8 44            	srl	a
- 597  01a9 44            	srl	a
- 598  01aa a403          	and	a,#3
- 599  01ac 6b03          	ld	(OFST-3,sp),a
- 601                     ; 213 	USB = Mux_Tbl[HDMI];
- 603  01ae 7b03          	ld	a,(OFST-3,sp)
- 604  01b0 5f            	clrw	x
- 605  01b1 97            	ld	xl,a
- 606  01b2 d60000        	ld	a,(_Mux_Tbl,x)
- 607  01b5 6b04          	ld	(OFST-2,sp),a
- 609                     ; 216 	if(((HDMI!= HDMI_NO_CONNECT)&&(HDMI_PORT->ODR & USB_SEL_MASK)!= USB))
- 611  01b7 7b03          	ld	a,(OFST-3,sp)
- 612  01b9 a101          	cp	a,#1
- 613  01bb 2715          	jreq	L302
- 615  01bd c6500a        	ld	a,20490
- 616  01c0 a4c0          	and	a,#192
- 617  01c2 1104          	cp	a,(OFST-2,sp)
- 618  01c4 270c          	jreq	L302
- 619                     ; 219 		sim();
- 622  01c6 9b            sim
- 624                     ; 220 		HDMI_PORT->ODR = (HDMI_PORT->ODR & HDMI_SW)|USB;
- 627  01c7 c6500a        	ld	a,20490
- 628  01ca a420          	and	a,#32
- 629  01cc 1a04          	or	a,(OFST-2,sp)
- 630  01ce c7500a        	ld	20490,a
- 631                     ; 221 		rim();
- 634  01d1 9a            rim
- 637  01d2               L302:
- 638                     ; 223 }
- 640  01d2 2083          	jra	L02
- 781                     	xdef	_Mux_Tbl
- 782                     	switch	.ubsct
- 783  0000               _Milli_Divider:
- 784  0000 00            	ds.b	1
- 785                     	xdef	_Milli_Divider
- 786  0001               _Milli_Timer2:
- 787  0001 00            	ds.b	1
- 788                     	xdef	_Milli_Timer2
- 789  0002               _Milli_Timer1:
- 790  0002 00            	ds.b	1
- 791                     	xdef	_Milli_Timer1
- 792  0003               _Micro_Timer1:
- 793  0003 00            	ds.b	1
- 794                     	xdef	_Micro_Timer1
- 795  0004               _Hotkeys:
- 796  0004 0000          	ds.b	2
- 797                     	xdef	_Hotkeys
- 798  0006               _PS2:
- 799  0006 0000000000    	ds.b	5
- 800                     	xdef	_PS2
- 801                     	xdef	_PS2_Task
- 802                     	xdef	_Init_Hardware
- 803                     	xdef	f_TIM4_IRQ
- 804                     	xdef	f_PORTB_IRQ
- 824                     	end
+ 478  012c 2676          	jrne	L551
+ 480  012e b605          	ld	a,_Hotkeys+1
+ 481  0130 a102          	cp	a,#2
+ 482  0132 2670          	jrne	L551
+ 483                     ; 158 						Hotkeys.State = HK_KeyMake_1;
+ 485  0134 35010004      	mov	_Hotkeys,#1
+ 486                     ; 159 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;
+ 488  0138 35190002      	mov	_Milli_Timer1,#25
+ 489                     ; 160 						return;
+ 491  013c 201b          	jra	L02
+ 492  013e               L101:
+ 493                     ; 164 				case HK_KeyMake_1:		// wait for hot key release instead of hold
+ 493                     ; 165 				  if(HOTKEY_RELEASE && Milli_Timer1)
+ 495  013e 1e05          	ldw	x,(OFST-1,sp)
+ 496  0140 a30014        	cpw	x,#20
+ 497  0143 2617          	jrne	L161
+ 499  0145 b605          	ld	a,_Hotkeys+1
+ 500  0147 a103          	cp	a,#3
+ 501  0149 2611          	jrne	L161
+ 503  014b 3d02          	tnz	_Milli_Timer1
+ 504  014d 270d          	jreq	L161
+ 505                     ; 167 						Hotkeys.KeyAttr = 0;
+ 507  014f 3f05          	clr	_Hotkeys+1
+ 508                     ; 168 						Hotkeys.State = HK_KeyBreak_1;
+ 510  0151 35020004      	mov	_Hotkeys,#2
+ 511                     ; 169 						Milli_Timer1 = HOTKEY_WAIT_DELAY;				
+ 513  0155 35140002      	mov	_Milli_Timer1,#20
+ 514                     ; 170 						return;
+ 515  0159               L02:
+ 518  0159 5b06          	addw	sp,#6
+ 519  015b 81            	ret
+ 520  015c               L161:
+ 521                     ; 173 						Hotkeys.State = HK_Idle;
+ 523  015c 3f04          	clr	_Hotkeys
+ 524  015e 2044          	jra	L551
+ 525  0160               L301:
+ 526                     ; 176 				case HK_KeyBreak_1:		// wait for hot key release
+ 526                     ; 177 				  if(HOTKEY_MAKE && Milli_Timer1)
+ 528  0160 1e05          	ldw	x,(OFST-1,sp)
+ 529  0162 a30014        	cpw	x,#20
+ 530  0165 2614          	jrne	L561
+ 532  0167 b605          	ld	a,_Hotkeys+1
+ 533  0169 a102          	cp	a,#2
+ 534  016b 260e          	jrne	L561
+ 536  016d 3d02          	tnz	_Milli_Timer1
+ 537  016f 270a          	jreq	L561
+ 538                     ; 179 						Hotkeys.State = HK_KeyMake_2;
+ 540  0171 35030004      	mov	_Hotkeys,#3
+ 541                     ; 180 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;				
+ 543  0175 35190002      	mov	_Milli_Timer1,#25
+ 544                     ; 181 						return;
+ 546  0179 20de          	jra	L02
+ 547  017b               L561:
+ 548                     ; 184 						Hotkeys.State = HK_Idle;
+ 550  017b 3f04          	clr	_Hotkeys
+ 551  017d 2025          	jra	L551
+ 552  017f               L501:
+ 553                     ; 187 				case HK_KeyMake_2:		// wait for hot key press again
+ 553                     ; 188 				  if(HOTKEY_RELEASE && Milli_Timer1)
+ 555  017f 1e05          	ldw	x,(OFST-1,sp)
+ 556  0181 a30014        	cpw	x,#20
+ 557  0184 261c          	jrne	L171
+ 559  0186 b605          	ld	a,_Hotkeys+1
+ 560  0188 a103          	cp	a,#3
+ 561  018a 2616          	jrne	L171
+ 563  018c 3d02          	tnz	_Milli_Timer1
+ 564  018e 2712          	jreq	L171
+ 565                     ; 191 						Milli_Timer1 = HOTKEY_USB_WAIT;
+ 567  0190 35050002      	mov	_Milli_Timer1,#5
+ 568  0194               L371:
+ 569                     ; 193 					  while(Milli_Timer1)
+ 572  0194 3d02          	tnz	_Milli_Timer1
+ 573  0196 26fc          	jrne	L371
+ 574                     ; 196 						HDMI_PORT->ODR &= ~HDMI_SW;						// Press select button(active low)	
+ 576  0198 721b500a      	bres	20490,#5
+ 577                     ; 197 					  Milli_Timer2 = HDMI_SW_DELAY;					// hold for delay
+ 579  019c 350a0001      	mov	_Milli_Timer2,#10
+ 581  01a0 2002          	jra	L551
+ 582  01a2               L171:
+ 583                     ; 200 						Hotkeys.State = HK_Idle;
+ 585  01a2 3f04          	clr	_Hotkeys
+ 586  01a4               L551:
+ 587                     ; 206 			Hotkeys.State = HK_Idle;
+ 589  01a4 3f04          	clr	_Hotkeys
+ 590                     ; 207 			Hotkeys.KeyAttr = 0;
+ 592  01a6 3f05          	clr	_Hotkeys+1
+ 593  01a8               L141:
+ 594                     ; 211 	HDMI = (HDMI_PORT->IDR & HDMI_SEL_MASK)>>HDMI_SHIFT;
+ 596  01a8 c6500b        	ld	a,20491
+ 597  01ab 44            	srl	a
+ 598  01ac 44            	srl	a
+ 599  01ad 44            	srl	a
+ 600  01ae a403          	and	a,#3
+ 601  01b0 6b03          	ld	(OFST-3,sp),a
+ 603                     ; 213 	USB = Mux_Tbl[HDMI];
+ 605  01b2 7b03          	ld	a,(OFST-3,sp)
+ 606  01b4 5f            	clrw	x
+ 607  01b5 97            	ld	xl,a
+ 608  01b6 d60000        	ld	a,(_Mux_Tbl,x)
+ 609  01b9 6b04          	ld	(OFST-2,sp),a
+ 611                     ; 216 	if(((HDMI!= HDMI_NO_CONNECT)&&(HDMI_PORT->ODR & USB_SEL_MASK)!= USB))
+ 613  01bb 7b03          	ld	a,(OFST-3,sp)
+ 614  01bd a101          	cp	a,#1
+ 615  01bf 2715          	jreq	L302
+ 617  01c1 c6500a        	ld	a,20490
+ 618  01c4 a4c0          	and	a,#192
+ 619  01c6 1104          	cp	a,(OFST-2,sp)
+ 620  01c8 270c          	jreq	L302
+ 621                     ; 219 		sim();
+ 624  01ca 9b            sim
+ 626                     ; 220 		HDMI_PORT->ODR = (HDMI_PORT->ODR & HDMI_SW)|USB;
+ 629  01cb c6500a        	ld	a,20490
+ 630  01ce a420          	and	a,#32
+ 631  01d0 1a04          	or	a,(OFST-2,sp)
+ 632  01d2 c7500a        	ld	20490,a
+ 633                     ; 221 		rim();
+ 636  01d5 9a            rim
+ 639  01d6               L302:
+ 640                     ; 223 }
+ 642  01d6 2081          	jra	L02
+ 783                     	xdef	_Mux_Tbl
+ 784                     	switch	.ubsct
+ 785  0000               _Milli_Divider:
+ 786  0000 00            	ds.b	1
+ 787                     	xdef	_Milli_Divider
+ 788  0001               _Milli_Timer2:
+ 789  0001 00            	ds.b	1
+ 790                     	xdef	_Milli_Timer2
+ 791  0002               _Milli_Timer1:
+ 792  0002 00            	ds.b	1
+ 793                     	xdef	_Milli_Timer1
+ 794  0003               _Micro_Timer1:
+ 795  0003 00            	ds.b	1
+ 796                     	xdef	_Micro_Timer1
+ 797  0004               _Hotkeys:
+ 798  0004 0000          	ds.b	2
+ 799                     	xdef	_Hotkeys
+ 800  0006               _PS2:
+ 801  0006 0000000000    	ds.b	5
+ 802                     	xdef	_PS2
+ 803                     	xdef	_PS2_Task
+ 804                     	xdef	_Init_Hardware
+ 805                     	xdef	f_TIM4_IRQ
+ 806                     	xdef	f_PORTB_IRQ
+ 826                     	end
