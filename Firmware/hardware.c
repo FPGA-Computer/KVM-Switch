@@ -49,7 +49,7 @@ void Init_Hardware(void)
 	
 	// unused GPIO defaults to output, push-pull
 	GPIOA->CR1 = GPIOA->DDR = PA1|PA2|PA3;
-	GPIOD->CR1 = GPIOD->DDR = PD1|PD2|PD3|PD4;
+	GPIOD->CR1 = GPIOD->DDR = PD2|PD3|PD4;
 	
 	// tim4 8-bit timer: Auto-reload, update = over/under flow, Counter enable
 	TIM4->CR1 = TIM4_CR1_ARPE|TIM4_CR1_URS|TIM4_CR1_CEN;
@@ -153,7 +153,7 @@ void PS2_Task(void)
 			switch(Hotkeys.State)
 			{
 				case HK_Idle:					// wait for hot key press
-				  if((ScanCode == HOTKEY_SCANCODE) && !Hotkeys.KeyAttr)
+				  if(HOTKEY_MAKE)
 					{
 						Hotkeys.State = HK_KeyMake_1;
 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;
@@ -162,7 +162,7 @@ void PS2_Task(void)
 					break;
 					
 				case HK_KeyMake_1:		// wait for hot key release instead of hold
-				  if((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release) && Milli_Timer1)
+				  if(HOTKEY_RELEASE && Milli_Timer1)
 					{
 						Hotkeys.KeyAttr = 0;
 						Hotkeys.State = HK_KeyBreak_1;
@@ -174,7 +174,7 @@ void PS2_Task(void)
 					break;
 					
 				case HK_KeyBreak_1:		// wait for hot key release
-				  if((ScanCode == HOTKEY_SCANCODE) && !Hotkeys.KeyAttr && Milli_Timer1)
+				  if(HOTKEY_MAKE && Milli_Timer1)
 					{
 						Hotkeys.State = HK_KeyMake_2;
 						Milli_Timer1 = HOTKEY_RELEASE_DELAY;				
@@ -185,7 +185,7 @@ void PS2_Task(void)
 					break;
 					
 				case HK_KeyMake_2:		// wait for hot key press again
-				  if((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release) && Milli_Timer1)
+				  if(HOTKEY_RELEASE && Milli_Timer1)
 					{	
 						// Wait for USB to finish sending hot key release to host
 						Milli_Timer1 = HOTKEY_USB_WAIT;

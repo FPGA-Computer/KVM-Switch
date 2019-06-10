@@ -30,7 +30,7 @@
 #define STM8S003
 
 #include "stm8s.h"
-#include <stdio.h>
+//#include <stdio.h>
 
 // STM8S003F3P6
 enum _PA { PA1=0x02, PA2=0x04, PA3=0x08 };
@@ -105,11 +105,22 @@ typedef struct
 #define PS2_KBD_CODE_EXTENDED   0xe0
 #define PS2_KBD_CODE_RELEASE    0xf0
 
+// CTRL
 #define HOTKEY_SCANCODE					0x14
+
+#define RCTRL		// Hotkey: Right CRTL
+
+#ifdef RCTRL		// Hotkey: Right CRTL
+#define HOTKEY_MAKE							((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Extend))
+#define HOTKEY_RELEASE					((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==(Key_Extend|Key_Release)))
+#else						// Hotkey: Left CRTL
+#define HOTKEY_MAKE							((ScanCode == HOTKEY_SCANCODE) && !Hotkeys.KeyAttr)
+#define HOTKEY_RELEASE					((ScanCode == HOTKEY_SCANCODE) && (Hotkeys.KeyAttr==Key_Release))
+#endif
 
 #define HOTKEY_RELEASE_DELAY		ms_TO_TICKS(250)
 #define HOTKEY_WAIT_DELAY				ms_TO_TICKS(200)
-#define HOTKEY_USB_WAIT					ms_TO_TICKS(30)
+#define HOTKEY_USB_WAIT					ms_TO_TICKS(50)
 #define HDMI_SW_DELAY						ms_TO_TICKS(100)
 
 typedef struct
