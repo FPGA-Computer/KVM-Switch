@@ -15,3 +15,15 @@ Hardware is licensed under CC BY-4.0
 
 https://creativecommons.org/licenses/by/4.0/
 
+Updates: change to Right CTRL key as hotkey.
+
+Updates:
+
+- Optional active or'ing circuit to replace/supplement Schottky diodes for lower voltage drops.
+
+Or'ing circuit imspired by RPi 3 Model B rev. 1.2 USB power circuit. The matching transistor pair is
+not needed - verified by simulation.  The circuit supports current sharing from multiple USB supplies.
+Voltage drop (around 100-200mV) is better than Schottky, but worse than chip or opamp designs (10's of mV).
+
+- new USB Mux-v0.2 PCB layout with larger wiring pads, pads for optional or'ing circuit
+
